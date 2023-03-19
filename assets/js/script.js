@@ -6,8 +6,14 @@ var $btnBegin = jQuery("#btn-begin");
 var $btnsubmit = jQuery("#btn-submit");
 var $btnHighScores = jQuery("#btn-high-scores");
 
+// create elements for later use
+var $timerElement = jQuery("<h2>");
+var $scoreElement = jQuery("<h2>");
+
+// initialize variables
 var score = 0;
-var TimeRemaining = 30;
+var timeRemaining = 10;
+var timeTaken = 0;
 var questionIndex = 0;
 var userAnswer;
 
@@ -17,12 +23,14 @@ $questionCard.attr("style", "display:none");
 // event listeners for begin, high scores, and submit buttons
 
 $btnBegin.click(function () {
-  beginGame();
+  beginQuiz();
 });
 $btnsubmit.click(function () {
   submitAnswer();
 });
-// btnHighScores.addEventListener("click", highScores);
+$btnHighScores.click(function () {
+  highScores();
+});
 
 // list of question objects each containing
 // a question, a list of answers, and the correct answer
@@ -63,21 +71,32 @@ var questions = [
 ];
 
 // begin game function
-function beginGame() {
+function beginQuiz() {
+  // reset variables incase quiz taken previously
+  score = 0;
+  timeRemaining = 10;
+  timeTaken = 0;
+  questionIndex = 0;
+  // reset all radios
+  $answerOptions.each(function () {
+    if (this.checked) {
+      // reset radio to off
+      this.checked = false;
+    }
+  });
+
   // display question card and hide btnBegin and btnHighScores
   $questionCard.attr("style", "display:none");
   $btnBegin.attr("style", "display:none");
   $btnHighScores.attr("style", "display:none");
   displayQuestion(0);
-  // // create timer element below question card
-  // timerElement = document.createElement("h2");
-  // timerElement.textContent =`Time Remaining: ${TimeRemaining}`;
-  // $questionCard.appendChild(timerElement);
+  // create timer element and start timer
+  $timerElement.appendTo(jQuery("header"));
+  quizTimer.Start;
 
-  // // create score element below question card
-  // scoreElement = document.createElement("h2");
-  // scoreElement.textContent = "Score: ";
-  // $questionCard.appendChild(scoreElement);
+  // create score element
+  $scoreElement.text(`Score: ${score}`);
+  $scoreElement.appendTo(jQuery("header"));
 }
 
 // fill out question card using questions array
@@ -85,44 +104,125 @@ function displayQuestion(whichQuestion) {
   // place question in question card
   $questionCard.attr("style", "display:block");
   $questionTitle.text(questions[whichQuestion].question);
-  // console.log(questions[whichQuestion].question);
-  // console.log($questionTitle);
 
-  // create list of answer elements
+  // label radios with answer options
   for (var i = 0; i < questions[whichQuestion].answers.length; i++) {
     jQuery(`#answer${i}`).text(questions[whichQuestion].answers[i]);
     jQuery(`#answer${i}_radio`).checked = false;
-    // console.log(questions[whichQuestion].answers[i]);
   }
+}
+
+var quizTimer = {
+  Start: function () {
+    this.timer = setInterval(function () {
+      // decrement timer
+      timeRemaining--;
+      // update timer
+      $timerElement.text(`Time Remaining: ${timeRemaining} seconds`);
+
+      if (timeRemaining <= 0) {
+        // stop timer
+        clearInterval(this.timer);
+        // send out of time message
+        endQuiz("out of time");
+      }
+    }, 1000);
+  },
+
+  Stop: function () {
+    clearInterval(this.timer);
+  },
+};
+
+// function quizTimer() {
+//   var timerInterval = setInterval(function () {
+//     // decrement timer
+//     timeRemaining--;
+//     // update timer
+//     $timerElement.text(`Time Remaining: ${timeRemaining} seconds`);
+
+//     if (timeRemaining <= 0) {
+//       // stop timer
+//       clearInterval(timerInterval);
+//       // send out of time message
+//       endQuiz('out of time');
+//     }
+//   }, 1000);
+// }
+
+function endQuiz(reason) {
+  if (reason === "out of time") {
+    // display out of time message
+    $timerElement.text("Time's up!");
+  } else if (reason === "finished") {
+    // end timer and display finished message
+    quizTimer.Stop();
+    $timerElement.text("You finished the quiz!");
+  } else {
+    // display error message
+    $timerElement.text("Error: " + reason);
+  }
+  // hide question card
+  $questionCard.attr("style", "display:none");
+  // show btnBegin and btnHighScores
+  $btnBegin.attr("style", "display:block");
+  $btnHighScores.attr("style", "display:block");
 }
 
 // submit answer function
 function submitAnswer() {
   // get correct answer
   var thisAnswer = questions[questionIndex].correctAnswer;
-  // get user answer
-  // TODO: loop through answer options and find which was selected
+  // loop through radio buttons to find which one is checked
   $answerOptions.each(function () {
     if (this.checked) {
-      // DEBUG: make sure this works
       // reset radio to off
       this.checked = false;
+      // get userAnswerIndex from the number in radio id
       let userAnswerIndex = this.id.match(/\d+/)[0];
       userAnswer = questions[questionIndex].answers[userAnswerIndex];
     }
   });
+  // check if last question
+  if (questionIndex === questions.length - 1) {
+    // last question - save score and time then end quiz
+    localStorage.setItem("score", score);
+    localStorage.setItem("timeTaken", timeTaken);
+    endQuiz("finished");
+  }
 
   // increment questionIndex
   questionIndex++;
+
   // check if user answer is correct
   if (userAnswer === thisAnswer) {
     // correct answer - increment score, add time, display next question
     score++;
-    TimeRemaining += 10;
-    displayQuestion(questionIndex);
+    $scoreElement.text(`Score: ${score}`);
+    timeRemaining += 10;
+    try {
+      displayQuestion(questionIndex);
+    } catch (error) {
+      console.log(error);
+    }
   } else {
     // incorrect answer - remove Time, display next question
-    TimeRemaining -= 10;
+    timeRemaining -= 10;
     displayQuestion(questionIndex);
+  }
+}
+
+function highScores() {
+  // display high scores
+  $scoreElement.text(`High Scores`);
+  $scoreElement.appendTo(jQuery("header"));
+  // loop through high scores
+  for (var i = 0; i < localStorage.length; i++) {
+    // get key and value
+    var key = localStorage.key(i);
+    var value = localStorage.getItem(key);
+    // display key and value
+    $scoreElement.text(`${key}: ${value}`);
+    $scoreElement.appendTo(jQuery("header"));
   }
 }
