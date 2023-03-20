@@ -3,17 +3,38 @@ var $questionCard = jQuery("#question-card");
 var $questionTitle = jQuery("#question-title");
 var $answerOptions = jQuery(".form-check-input");
 var $btnBegin = jQuery("#btn-begin");
-var $btnsubmit = jQuery("#btn-submit");
+var $btnSubmit = jQuery("#btn-submit"); // starts hidden
 var $btnHighScores = jQuery("#btn-high-scores");
 
 // create elements for later use
 var $timerElement = jQuery("<h2>");
 var $scoreElement = jQuery("<h2>");
+var $nameInputHeaderElement = jQuery(
+  "<h3>Enter your name to save your score:</h3>"
+);
+var $nameInputElement = jQuery(
+  `<div class="input-group flex-nowrap">
+  <input 
+    type="text" 
+    class="form-control" 
+    placeholder="Name" 
+    aria-label="Username" 
+    style="max-width:15rem"
+</div>`
+);
+var $btnSubmitScore = jQuery(
+  `<button
+  class="btn btn-primary col-3 mx-auto my-3"
+  type="button"
+  id="btn-submit-score"
+>
+  Submit Score
+</button>`
+);
 
 // initialize variables
 var score = 0;
 var timeRemaining = 10;
-var timeTaken = 0;
 var questionIndex = 0;
 var userAnswer;
 
@@ -21,15 +42,17 @@ var userAnswer;
 $questionCard.attr("style", "display:none");
 
 // event listeners for begin, high scores, and submit buttons
-
 $btnBegin.click(function () {
   beginQuiz();
 });
-$btnsubmit.click(function () {
+$btnSubmit.click(function () {
   submitAnswer();
 });
 $btnHighScores.click(function () {
-  highScores();
+  displayScores();
+});
+$btnSubmitScore.click(function () {
+  submitScore();
 });
 
 // list of question objects each containing
@@ -72,11 +95,48 @@ var questions = [
 
 // begin game function
 function beginQuiz() {
+  // hide btnBegin, btnHighScores and display question card
+  $btnHighScores.attr("style", "display:none");
+  displayQuestion(0);
+  $btnBegin.attr("style", "display:none");
+  // create timer element and start timer
+  $timerElement.appendTo(jQuery("main"));
+  $timerElement.attr("class", "container");
+  $timerElement.addClass("mx-auto");
+  $timerElement.addClass("text-center");
+  quizTimer.Start();
+
+  // create score element
+  $scoreElement.text(`Score: ${score}`);
+  $scoreElement.appendTo(jQuery("header"));
+}
+
+function displayReset() {
   // reset variables incase quiz taken previously
   score = 0;
   timeRemaining = 10;
-  timeTaken = 0;
   questionIndex = 0;
+
+  if ($nameInputHeaderElement) {
+    $nameInputHeaderElement.remove();
+    $nameInputElement.remove();
+  }
+  if ($btnSubmitScore) {
+    $btnSubmitScore.remove();
+  }
+  if ($timerElement) {
+    $timerElement.remove();
+  }
+  if ($scoreElement) {
+    $scoreElement.remove();
+  }
+  if ($nameInputElement) {
+    $nameInputElement.remove();
+  }
+  if ($nameInputHeaderElement) {
+    $nameInputHeaderElement.remove();
+  }
+
   // reset all radios
   $answerOptions.each(function () {
     if (this.checked) {
@@ -84,25 +144,12 @@ function beginQuiz() {
       this.checked = false;
     }
   });
-
-  // display question card and hide btnBegin and btnHighScores
-  $questionCard.attr("style", "display:none");
-  $btnBegin.attr("style", "display:none");
-  $btnHighScores.attr("style", "display:none");
-  displayQuestion(0);
-  // create timer element and start timer
-  $timerElement.appendTo(jQuery("header"));
-  quizTimer.Start;
-
-  // create score element
-  $scoreElement.text(`Score: ${score}`);
-  $scoreElement.appendTo(jQuery("header"));
 }
 
 // fill out question card using questions array
 function displayQuestion(whichQuestion) {
   // place question in question card
-  $questionCard.attr("style", "display:block");
+  $questionCard.attr("style", "display:block; max-width:40rem");
   $questionTitle.text(questions[whichQuestion].question);
 
   // label radios with answer options
@@ -118,7 +165,7 @@ var quizTimer = {
       // decrement timer
       timeRemaining--;
       // update timer
-      $timerElement.text(`Time Remaining: ${timeRemaining} seconds`);
+      $timerElement.text(`Time Remaining: ${timeRemaining}`);
 
       if (timeRemaining <= 0) {
         // stop timer
@@ -134,30 +181,17 @@ var quizTimer = {
   },
 };
 
-// function quizTimer() {
-//   var timerInterval = setInterval(function () {
-//     // decrement timer
-//     timeRemaining--;
-//     // update timer
-//     $timerElement.text(`Time Remaining: ${timeRemaining} seconds`);
-
-//     if (timeRemaining <= 0) {
-//       // stop timer
-//       clearInterval(timerInterval);
-//       // send out of time message
-//       endQuiz('out of time');
-//     }
-//   }, 1000);
-// }
-
 function endQuiz(reason) {
   if (reason === "out of time") {
     // display out of time message
+    quizTimer.Stop();
     $timerElement.text("Time's up!");
   } else if (reason === "finished") {
     // end timer and display finished message
     quizTimer.Stop();
     $timerElement.text("You finished the quiz!");
+    // display score for this attempt
+    $scoreElement.text(`Score: ${score} out of ${questions.length}`);
   } else {
     // display error message
     $timerElement.text("Error: " + reason);
@@ -167,6 +201,35 @@ function endQuiz(reason) {
   // show btnBegin and btnHighScores
   $btnBegin.attr("style", "display:block");
   $btnHighScores.attr("style", "display:block");
+
+  // prompt user to save score
+  promptUser();
+}
+
+// prompt user to save their score
+function promptUser() {
+  // prompt user to save score
+
+  $nameInputHeaderElement.appendTo(jQuery("#btn-group"));
+  $nameInputHeaderElement.attr("class", "container");
+  $nameInputHeaderElement.addClass("mx-auto");
+  $nameInputHeaderElement.addClass("text-center");
+
+  $nameInputElement.appendTo(jQuery("#btn-group"));
+  $nameInputElement.attr("class", "container");
+  $nameInputElement.addClass("mx-auto");
+  $nameInputElement.addClass("text-center");
+
+  $btnSubmitScore.appendTo(jQuery("#btn-group"));
+  $btnSubmitScore.attr("class", "container");
+  $btnSubmitScore.addClass("mx-auto");
+  $btnSubmitScore.addClass("text-center");
+}
+
+function submitScore() {
+  // store name and score in local storage
+  var userName = jQuery(".form-control").val();
+  localStorage.setItem(userName, `${score}/${questions.length}`);
 }
 
 // submit answer function
@@ -183,46 +246,43 @@ function submitAnswer() {
       userAnswer = questions[questionIndex].answers[userAnswerIndex];
     }
   });
-  // check if last question
-  if (questionIndex === questions.length - 1) {
-    // last question - save score and time then end quiz
-    localStorage.setItem("score", score);
-    localStorage.setItem("timeTaken", timeTaken);
-    endQuiz("finished");
-  }
 
   // increment questionIndex
   questionIndex++;
 
   // check if user answer is correct
   if (userAnswer === thisAnswer) {
-    // correct answer - increment score, add time, display next question
+    // correct answer - increment score, add time
     score++;
     $scoreElement.text(`Score: ${score}`);
     timeRemaining += 10;
-    try {
-      displayQuestion(questionIndex);
-    } catch (error) {
-      console.log(error);
-    }
   } else {
-    // incorrect answer - remove Time, display next question
+    // incorrect answer - remove Time
     timeRemaining -= 10;
+  }
+  // check if last question
+  if (0 <= questionIndex && questionIndex < questions.length) {
     displayQuestion(questionIndex);
+  } else {
+    endQuiz("finished");
   }
 }
 
-function highScores() {
+function displayScores() {
   // display high scores
-  $scoreElement.text(`High Scores`);
-  $scoreElement.appendTo(jQuery("header"));
+  // TODO: add header
+  // TODO: alignment/style
+  // FIXME: doesn't print all records
+  let $scoreRecords = jQuery("<h3>").appendTo(jQuery("main"));
   // loop through high scores
   for (var i = 0; i < localStorage.length; i++) {
     // get key and value
     var key = localStorage.key(i);
     var value = localStorage.getItem(key);
     // display key and value
-    $scoreElement.text(`${key}: ${value}`);
-    $scoreElement.appendTo(jQuery("header"));
+    $scoreRecords.text(`${key} : ${value}`);
+    $scoreRecords
+      .appendTo(jQuery("main"))
+      .attr("class", "container mx-auto text-center");
   }
 }
