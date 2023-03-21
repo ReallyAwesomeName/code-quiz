@@ -1,3 +1,6 @@
+// debug: submit score button removal not working. Clicking high 
+// debug: scores button a second time adds a second list instead of 
+// debug: overwriting the old list. 
 // select elements
 var $questionCard = jQuery("#question-card");
 var $questionTitle = jQuery("#question-title");
@@ -9,6 +12,7 @@ var $btnHighScores = jQuery("#btn-high-scores");
 // create elements for later use
 var $timerElement = jQuery("<h2>");
 var $scoreElement = jQuery("<h2>");
+var $scoreRecords = jQuery("<ul>")
 var $nameInputHeaderElement = jQuery(
   "<h3>Enter your name to save your score:</h3>"
 );
@@ -34,7 +38,6 @@ var $btnSubmitScore = jQuery(
 
 // initialize variables
 var score = 0;
-var timeRemaining = 10;
 var questionIndex = 0;
 var userAnswer;
 
@@ -87,6 +90,7 @@ var questions = [
   },
   {
     question:
+      // fixme: fix this sentence
       "A very useful tool used during development and debugging for printing content to the debugger is:",
     answers: ["JavaScript", "terminal/bash", "for loops", "console.log"],
     correctAnswer: "console.log",
@@ -95,6 +99,7 @@ var questions = [
 
 // begin game function
 function beginQuiz() {
+  displayReset();
   // hide btnBegin, btnHighScores and display question card
   $btnHighScores.attr("style", "display:none");
   displayQuestion(0);
@@ -114,27 +119,23 @@ function beginQuiz() {
 function displayReset() {
   // reset variables incase quiz taken previously
   score = 0;
-  timeRemaining = 10;
   questionIndex = 0;
 
   if ($nameInputHeaderElement) {
     $nameInputHeaderElement.remove();
-    $nameInputElement.remove();
-  }
-  if ($btnSubmitScore) {
-    $btnSubmitScore.remove();
-  }
-  if ($timerElement) {
-    $timerElement.remove();
-  }
-  if ($scoreElement) {
-    $scoreElement.remove();
   }
   if ($nameInputElement) {
     $nameInputElement.remove();
   }
-  if ($nameInputHeaderElement) {
-    $nameInputHeaderElement.remove();
+  // fixme: this breaks submission
+  // if ($btnSubmitScore) {
+  //   $btnSubmitScore.remove();
+  // }
+  if ($timerElement) {
+    $timerElement.remove();
+  }
+  if ($scoreRecords) {
+    $scoreRecords.remove();
   }
 
   // reset all radios
@@ -153,7 +154,7 @@ function displayQuestion(whichQuestion) {
   $questionTitle.text(questions[whichQuestion].question);
 
   // label radios with answer options
-  for (var i = 0; i < questions[whichQuestion].answers.length; i++) {
+  for (let i = 0; i < questions[whichQuestion].answers.length; i++) {
     jQuery(`#answer${i}`).text(questions[whichQuestion].answers[i]);
     jQuery(`#answer${i}_radio`).checked = false;
   }
@@ -161,6 +162,7 @@ function displayQuestion(whichQuestion) {
 
 var quizTimer = {
   Start: function () {
+    timeRemaining = 15;
     this.timer = setInterval(function () {
       // decrement timer
       timeRemaining--;
@@ -209,21 +211,14 @@ function endQuiz(reason) {
 // prompt user to save their score
 function promptUser() {
   // prompt user to save score
-
   $nameInputHeaderElement.appendTo(jQuery("#btn-group"));
-  $nameInputHeaderElement.attr("class", "container");
-  $nameInputHeaderElement.addClass("mx-auto");
-  $nameInputHeaderElement.addClass("text-center");
+  $nameInputHeaderElement.attr("class", "mx-auto");
 
   $nameInputElement.appendTo(jQuery("#btn-group"));
-  $nameInputElement.attr("class", "container");
-  $nameInputElement.addClass("mx-auto");
-  $nameInputElement.addClass("text-center");
+  $nameInputElement.attr("class", "col-3 mx-auto my-3");
 
   $btnSubmitScore.appendTo(jQuery("#btn-group"));
-  $btnSubmitScore.attr("class", "container");
-  $btnSubmitScore.addClass("mx-auto");
-  $btnSubmitScore.addClass("text-center");
+  $btnSubmitScore.attr("class", "btn btn-primary mx-auto my-3");
 }
 
 function submitScore() {
@@ -270,17 +265,18 @@ function submitAnswer() {
 
 function displayScores() {
   // display high scores
-  // TODO: add header
-  // TODO: alignment/style
-  // FIXME: doesn't print all records
-  let $scoreRecords = jQuery("<h3>").appendTo(jQuery("main"));
+  // todo: add header
+  // todo: make text larger
+  // todo: remove bullet points
+  // todo: line breaks between entries
+  $scoreRecords.appendTo(jQuery("main"));
   // loop through high scores
-  for (var i = 0; i < localStorage.length; i++) {
+  for (let i = 0; i < localStorage.length; i++) {
     // get key and value
-    var key = localStorage.key(i);
-    var value = localStorage.getItem(key);
-    // display key and value
-    $scoreRecords.text(`${key} : ${value}`);
+    let key = localStorage.key(i);
+    let value = localStorage.getItem(key);
+    // remove bullet points and display key value pairs
+    $scoreRecords.append(`<li>\n${key} : ${value}</li>`);
     $scoreRecords
       .appendTo(jQuery("main"))
       .attr("class", "container mx-auto text-center");
