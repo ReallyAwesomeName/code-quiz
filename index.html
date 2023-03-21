@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -13,57 +13,57 @@
     />
     <link rel="stylesheet" href="./assets/css/style.css" />
 
-    <title>Document</title>
+    <title>Quiz</title>
   </head>
 
   <body>
     <header class="py-3 text-center bg-custom">
-      <h1>QUIZ TITLE</h1>
+      <h1>Code Quiz</h1>
     </header>
     <main>
-      <div class="card container my-5">
-        <div class="card-header">QUESTION</div>
-        <div class="form-check">
+      <div class="card container my-5" id="question-card">
+        <div class="card-header" id="question-title">QUESTION</div>
+        <div class="form-check my-3">
           <input
             class="form-check-input"
             type="radio"
             name="flexRadioDefault"
-            id="flexRadioDefault1"
+            id="answer0_radio"
           />
-          <label class="form-check-label" for="flexRadioDefault1">
+          <label class="form-check-label" for="answer0_radio" id="answer0">
             Default radio
           </label>
         </div>
-        <div class="form-check">
+        <div class="form-check my-3">
           <input
             class="form-check-input"
             type="radio"
             name="flexRadioDefault"
-            id="flexRadioDefault2"
+            id="answer1_radio"
           />
-          <label class="form-check-label" for="flexRadioDefault2">
+          <label class="form-check-label" for="answer1_radio" id="answer1">
             Default radio
           </label>
         </div>
-        <div class="form-check">
+        <div class="form-check my-3">
           <input
             class="form-check-input"
             type="radio"
             name="flexRadioDefault"
-            id="flexRadioDefault3"
+            id="answer2_radio"
           />
-          <label class="form-check-label" for="flexRadioDefault3">
+          <label class="form-check-label" for="answer2_radio" id="answer2">
             Default radio
           </label>
         </div>
-        <div class="form-check">
+        <div class="form-check my-3">
           <input
             class="form-check-input"
             type="radio"
             name="flexRadioDefault"
-            id="flexRadioDefault4"
+            id="answer3_radio"
           />
-          <label class="form-check-label" for="flexRadioDefault4">
+          <label class="form-check-label" for="answer3_radio" id="answer3">
             Default radio
           </label>
         </div>
@@ -73,7 +73,24 @@
           type="submit"
           value="Submit"
           style="width: 15rem; margin-bottom: 1rem"
+          id="btn-submit"
         />
+      </div>
+      <div class="d-grid gap-2 d-md-block text-center" id="btn-group">
+        <button
+          class="btn btn-primary col-3 mx-auto my-3"
+          type="button"
+          id="btn-begin"
+        >
+          Begin!
+        </button>
+        <button
+          class="btn btn-primary col-3 mx-auto my-3"
+          type="button"
+          id="btn-high-scores"
+        >
+          High Scores
+        </button>
       </div>
     </main>
     <script
