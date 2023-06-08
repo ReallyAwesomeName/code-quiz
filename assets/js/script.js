@@ -1,22 +1,20 @@
-// debug: submit score button removal not working. Clicking high 
-// debug: scores button a second time adds a second list instead of 
-// debug: overwriting the old list. 
+// DEBUG: submit score button removal not working. Clicking high
+// DEBUG: scores button a second time adds a second list instead of
+// DEBUG: overwriting the old list.
 // select elements
-var $questionCard = jQuery("#question-card");
-var $questionTitle = jQuery("#question-title");
-var $answerOptions = jQuery(".form-check-input");
-var $btnBegin = jQuery("#btn-begin");
-var $btnSubmit = jQuery("#btn-submit"); // starts hidden
-var $btnHighScores = jQuery("#btn-high-scores");
+var $questionCard = $("#question-card");
+var $questionTitle = $("#question-title");
+var $answerOptions = $(".form-check-input");
+var $btnBegin = $("#btn-begin");
+var $btnSubmit = $("#btn-submit"); // starts hidden
+var $btnHighScores = $("#btn-high-scores");
 
 // create elements for later use
-var $timerElement = jQuery("<h2>");
-var $scoreElement = jQuery("<h2>");
-var $scoreRecords = jQuery("<ul>")
-var $nameInputHeaderElement = jQuery(
-  "<h3>Enter your name to save your score:</h3>"
-);
-var $nameInputElement = jQuery(
+var $timerElement = $("<h2>");
+var $scoreElement = $("<h2>");
+var $scoreRecords = $("<ul>");
+var $nameInputHeaderElement = $("<h3>Enter your name to save your score:</h3>");
+var $nameInputElement = $(
   `<div class="input-group flex-nowrap">
   <input 
     type="text" 
@@ -26,7 +24,7 @@ var $nameInputElement = jQuery(
     style="max-width:15rem"
 </div>`
 );
-var $btnSubmitScore = jQuery(
+var $btnSubmitScore = $(
   `<button
   class="btn btn-primary col-3 mx-auto my-3"
   type="button"
@@ -90,7 +88,7 @@ var questions = [
   },
   {
     question:
-      // fixme: fix this sentence
+      // FIXME: fix this sentence
       "A very useful tool used during development and debugging for printing content to the debugger is:",
     answers: ["JavaScript", "terminal/bash", "for loops", "console.log"],
     correctAnswer: "console.log",
@@ -105,7 +103,7 @@ function beginQuiz() {
   displayQuestion(0);
   $btnBegin.attr("style", "display:none");
   // create timer element and start timer
-  $timerElement.appendTo(jQuery("main"));
+  $timerElement.appendTo($("main"));
   $timerElement.attr("class", "container");
   $timerElement.addClass("mx-auto");
   $timerElement.addClass("text-center");
@@ -113,7 +111,7 @@ function beginQuiz() {
 
   // create score element
   $scoreElement.text(`Score: ${score}`);
-  $scoreElement.appendTo(jQuery("header"));
+  $scoreElement.appendTo($("header"));
 }
 
 function displayReset() {
@@ -127,7 +125,7 @@ function displayReset() {
   if ($nameInputElement) {
     $nameInputElement.remove();
   }
-  // fixme: this breaks submission
+  // FIXME: this breaks submission
   // if ($btnSubmitScore) {
   //   $btnSubmitScore.remove();
   // }
@@ -155,8 +153,8 @@ function displayQuestion(whichQuestion) {
 
   // label radios with answer options
   for (let i = 0; i < questions[whichQuestion].answers.length; i++) {
-    jQuery(`#answer${i}`).text(questions[whichQuestion].answers[i]);
-    jQuery(`#answer${i}_radio`).checked = false;
+    $(`#answer${i}`).text(questions[whichQuestion].answers[i]);
+    $(`#answer${i}_radio`).checked = false;
   }
 }
 
@@ -211,19 +209,19 @@ function endQuiz(reason) {
 // prompt user to save their score
 function promptUser() {
   // prompt user to save score
-  $nameInputHeaderElement.appendTo(jQuery("#btn-group"));
+  $nameInputHeaderElement.appendTo($("#btn-group"));
   $nameInputHeaderElement.attr("class", "mx-auto");
 
-  $nameInputElement.appendTo(jQuery("#btn-group"));
+  $nameInputElement.appendTo($("#btn-group"));
   $nameInputElement.attr("class", "col-3 mx-auto my-3");
 
-  $btnSubmitScore.appendTo(jQuery("#btn-group"));
+  $btnSubmitScore.appendTo($("#btn-group"));
   $btnSubmitScore.attr("class", "btn btn-primary mx-auto my-3");
 }
 
 function submitScore() {
   // store name and score in local storage
-  var userName = jQuery(".form-control").val();
+  var userName = $(".form-control").val();
   localStorage.setItem(userName, `${score}/${questions.length}`);
 }
 
@@ -265,11 +263,11 @@ function submitAnswer() {
 
 function displayScores() {
   // display high scores
-  // todo: add header
-  // todo: make text larger
-  // todo: remove bullet points
-  // todo: line breaks between entries
-  $scoreRecords.appendTo(jQuery("main"));
+  // TODO: add header
+  // TODO: make text larger
+  // TODO: remove bullet points
+  // TODO: line breaks between entries
+  $scoreRecords.appendTo($("main"));
   // loop through high scores
   for (let i = 0; i < localStorage.length; i++) {
     // get key and value
@@ -278,7 +276,7 @@ function displayScores() {
     // remove bullet points and display key value pairs
     $scoreRecords.append(`<li>\n${key} : ${value}</li>`);
     $scoreRecords
-      .appendTo(jQuery("main"))
+      .appendTo($("main"))
       .attr("class", "container mx-auto text-center");
   }
 }
